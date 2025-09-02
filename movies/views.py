@@ -2,16 +2,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Review
 from django.contrib.auth.decorators import login_required
 def index(request):
-    search_term = request.GET.get('search')
+    search_term = request.GET.get('search','')
     if search_term:
         movies = Movie.objects.filter(name__icontains=search_term)
     else:
         movies = Movie.objects.all()
     template_data = {}
     template_data['title'] = 'Movies'
-    template_data['movies'] = Movie.objects.all()
-    return render(request, 'movies/index.html',
-                  {'template_data': template_data})
+    template_data['movies'] = movies
+    return render(request, 'movies/index.html',{'template_data': template_data})
 def show(request, id):
     movie = Movie.objects.get(id=id)
     reviews = Review.objects.filter(movie=movie)
