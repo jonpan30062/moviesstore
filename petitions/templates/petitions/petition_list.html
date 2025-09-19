@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Movie Petitions{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Movie Petitions</h2>
+            <p class="text-muted">Vote for movies you'd like to see added to our store!</p>
+            
+            {% if user.is_authenticated %}
+            <a href="{% url 'create_petition' %}" class="btn btn-primary mb-3">
+                <i class="fas fa-plus"></i> Create New Petition
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for petition in petitions %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ petition.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ petition.movie_name }}</h6>
+                    <p class="card-text">{{ petition.description|truncatewords:20 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            By {{ petition.created_by.username }} on {{ petition.created_at|date:"M d, Y" }}
+                        </small>
+                        <div class="vote-info">
+                            <span class="badge bg-success">{{ petition.vote_count }} Yes</span>
+                            <span class="badge bg-secondary">{{ petition.total_votes }} Total</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'petition_detail' petition.id %}" class="btn btn-outline-primary btn-sm">
+                        View Details & Vote
+                    </a>
+                    {% if petition.is_approved %}
+                    <span class="badge bg-success ms-2">Approved by Admin</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4>No petitions yet!</h4>
+                <p>Be the first to create a petition for a movie you'd like to see in our store.</p>
+                {% if user.is_authenticated %}
+                <a href="{% url 'create_petition' %}" class="btn btn-primary">Create First Petition</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

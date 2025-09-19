@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Review
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db import IntegrityError
+
 def index(request):
     search_term = request.GET.get('search','')
     if search_term:
@@ -11,6 +14,7 @@ def index(request):
     template_data['title'] = 'Movies'
     template_data['movies'] = movies
     return render(request, 'movies/index.html',{'template_data': template_data})
+
 def show(request, id):
     movie = Movie.objects.get(id=id)
     reviews = Review.objects.filter(movie=movie)
@@ -20,6 +24,7 @@ def show(request, id):
     template_data['reviews'] = reviews
     return render(request, 'movies/show.html',
                   {'template_data': template_data})
+
 @login_required
 def create_review(request, id):
     if request.method == 'POST' and request.POST['comment'] != '':
@@ -32,6 +37,7 @@ def create_review(request, id):
         return redirect('movies.show', id=id)
     else:
         return redirect('movies.show', id=id)
+
 @login_required
 def edit_review(request, id, review_id):
     review = get_object_or_404(Review, id=review_id)
@@ -50,9 +56,12 @@ def edit_review(request, id, review_id):
         return redirect('movies.show', id=id)
     else:
         return redirect('movies.show', id=id)
+
 @login_required
 def delete_review(request, id, review_id):
     review = get_object_or_404(Review, id=review_id,
         user=request.user)
     review.delete()
     return redirect('movies.show', id=id)
+
+
